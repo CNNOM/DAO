@@ -22,11 +22,14 @@
         <TextField fx:id="tagField" promptText="Product tag" minWidth="150"/>
     </HBox>
 
-    <!-- Кнопки управления -->
+    <!-- Кнопки управления и выбор хранилища -->
     <HBox alignment="CENTER" spacing="10">
         <Button fx:id="addButton" text="Add" onAction="#handleAdd" minWidth="80"/>
         <Button fx:id="updateButton" text="Update" onAction="#handleUpdate" minWidth="80"/>
         <Button fx:id="deleteButton" text="Delete" onAction="#handleDelete" minWidth="80"/>
+
+        <Label text="Save to:"/>
+        <ComboBox fx:id="storageTypeComboBox" minWidth="120"/>
     </HBox>
 
     <!-- Таблица продуктов -->

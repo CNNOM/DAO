@@ -8,7 +8,7 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 
 public class Controller {
-    private final ProductDao productDao = new ProductDaoImpl();
+    private ProductDao productDao;
     private final ObservableList<Product> productList = FXCollections.observableArrayList();
 
     @FXML
@@ -35,10 +35,12 @@ public class Controller {
     private Button updateButton;
     @FXML
     private Button deleteButton;
+    @FXML
+    private ComboBox<String> storageTypeComboBox;
 
     @FXML
     public void initialize() {
-        // Set up the table columns
+        // Инициализация столбцов таблицы
         idColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
         nameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
         quantityColumn.setCellValueFactory(new PropertyValueFactory<>("quantity"));
@@ -49,16 +51,44 @@ public class Controller {
             return new SimpleStringProperty(status);
         });
 
-        // Load data
-        refreshTable();
+        // Инициализация ComboBox
+        storageTypeComboBox.getItems().addAll("Memory", "JSON", "MongoDB", "All");
+        storageTypeComboBox.getSelectionModel().selectFirst();
+        storageTypeComboBox.getSelectionModel().selectedItemProperty().addListener(
+                (obs, oldVal, newVal) -> switchStorageType(newVal));
 
-        // Set selection listener
+        // Загрузка данных
+        switchStorageType(storageTypeComboBox.getValue());
+
+        // Обработчик выбора в таблице
         productTable.getSelectionModel().selectedItemProperty().addListener(
                 (obs, oldSelection, newSelection) -> {
                     if (newSelection != null) {
                         populateFields(newSelection);
                     }
                 });
+    }
+
+    private void switchStorageType(String type) {
+        switch (type) {
+            case "Memory":
+                productDao = DaoFactory.createProductDao("memory");
+                break;
+            case "JSON":
+                productDao = DaoFactory.createProductDao("json");
+                break;
+            case "MongoDB":
+                productDao = DaoFactory.createProductDao("mongo");
+                break;
+            case "All":
+                productDao = new CompositeProductDao(
+                        DaoFactory.createProductDao("memory"),
+                        DaoFactory.createProductDao("json"),
+                        DaoFactory.createProductDao("mongo")
+                );
+                break;
+        }
+        refreshTable();
     }
 
     private void refreshTable() {
@@ -82,7 +112,7 @@ public class Controller {
     private void handleAdd() {
         try {
             Product product = new Product(
-                    0, // ID will be set by DAO
+                    0, // ID будет установлен DAO
                     nameField.getText(),
                     Integer.parseInt(quantityField.getText()),
                     tagField.getText()
