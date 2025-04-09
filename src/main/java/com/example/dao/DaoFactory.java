@@ -8,8 +8,8 @@ public class DaoFactory {
             case "mongo":
                 return new ProductDaoMongoImpl(
                         "mongodb://localhost:27017",
-                        "productDB",
-                        "products"
+                        "dao",
+                        "dao2"
                 );
             case "json":
                 return new ProductDaoJsonImpl("data/products.json");

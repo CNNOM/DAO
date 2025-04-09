@@ -21,6 +21,7 @@ public class ProductDaoMongoImpl implements ProductDao {
     @Override
     public void addProduct(Product product) {
         Document doc = new Document()
+                .append("_id", product.getId())  // Явно указываем числовой ID
                 .append("name", product.getName())
                 .append("quantity", product.getQuantity())
                 .append("tag", product.getTag());
@@ -30,7 +31,7 @@ public class ProductDaoMongoImpl implements ProductDao {
     @Override
     public void updateProduct(Product product) {
         collection.updateOne(
-                new Document("_id", product.getId()),
+                new Document("_id", product.getId()),  // Используем числовой ID
                 new Document("$set", new Document()
                         .append("name", product.getName())
                         .append("quantity", product.getQuantity())
@@ -40,7 +41,7 @@ public class ProductDaoMongoImpl implements ProductDao {
 
     @Override
     public void deleteProduct(int id) {
-        collection.deleteOne(new Document("_id", id));
+        collection.deleteOne(new Document("_id", id));  // Используем числовой ID
     }
 
     @Override
@@ -48,7 +49,7 @@ public class ProductDaoMongoImpl implements ProductDao {
         List<Product> products = new ArrayList<>();
         for (Document doc : collection.find()) {
             products.add(new Product(
-                    doc.getInteger("_id"),
+                    doc.getInteger("_id"),  // Получаем числовой ID
                     doc.getString("name"),
                     doc.getInteger("quantity"),
                     doc.getString("tag")
